@@ -1,6 +1,6 @@
 package org.example;
-import javax.swing.plaf.nimbus.State;
 import java.sql.*;
+import java.util.Objects;
 
 class User{
     private String username;
@@ -9,7 +9,7 @@ class User{
 
     public User() {
 
-    };
+    }
     public void setUsername(String username) {
 
         if (username.length() < 5) {
@@ -110,7 +110,7 @@ public class Main {
         statement.executeUpdate("create table account (id integer, username string, pin integer, amount integer)");
 
         System.out.println("Successfully create new Account table");
-    };
+    }
 
     public static void insertToTable(String newTableName, String username, String email, String password) throws SQLException {
         Connection connection = connectToDB();
@@ -141,80 +141,41 @@ public class Main {
         System.out.println("Records updated for account table");
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static boolean checkPin(String username, int pin) {
+        // open connection to the db
+        // execute a query to get a particular user by matching the username
+        // check if the pin is correct by matching the pin with the existing pin
+        // return boolean response
 
+        return false;
+    }
+
+    public static boolean checkAccountBalance(String username, int amountForWithdrawal) throws SQLException {
         Connection connection = connectToDB();
 
         Statement statement = connection.createStatement();
+
+        // SQL Query to return a user with the same username on both the account ans user table.
         ResultSet rs = statement.executeQuery("select * from user inner join account on user.username=account.username");
-        int defaultAmount = 0;
-        while(rs.next())
-            {
-                // read the result set
-                System.out.println("username = " + rs.getString("username"));
-                System.out.println("id = " + rs.getInt("id"));
-                System.out.println("amount = " + rs.getInt("amount"));
-                System.out.println("amount = " + rs.getInt("pin"));
 
-                defaultAmount += rs.getInt("amount");
+        int usersBalance = 0;
+
+        while (rs.next()) {
+
+            if (Objects.equals(rs.getString("username"), username)) {
+                usersBalance += rs.getInt("amount");
             }
-        System.out.println(defaultAmount);
+        }
 
-
-//        connectToDB();
-//        dropTables("account");
-//        createTable("user");
-//        createAccountTable();
-//        insertToTable("'user'", "'james'", "'james@gmail.com'", "'testing321'");
-//        insertToAccountTable("'james'", 2342, 2322323);
-
-
-//        String oldTable = "persons";
-//        String newTable = "user";
-//        dropTables(oldTable);
-//        createTable(newTable);
-//        insertToTable(newTable, "'somto'", "'somto@gmail.com'", "'testing321'");
-
+        return amountForWithdrawal > usersBalance;
     }
 
-    // CREATE FUNCTION TO HANDLE ATM CREATION
-    // CREATE FUNCTION TO HANDLE JOINING ATM TABLE WITH USER TABLE
-    // ADD ATM FUNCTIONALITIES FOR USER CLASS
-    // ANYTHING ELSE THAT COMES TO MIND
+    public static void main(String[] args) {
+        // TODO
+        // Add logic to handle updating user amount/account balance after performing a withdrawal.
+        // Make the username field on both the account and user tables unique to reduce redundant code.
+        // Add logic to handle the ATM system withdrawal.
+        // Complete the logic on checkPin function.
 
-//        Connection connection = null;
-//
-//        try {
-//
-//            connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
-//            Statement statement = connection.createStatement();
-//
-//            statement.setQueryTimeout(30);
-//
-//            statement.executeUpdate("drop table if exists users");
-//            statement.executeUpdate("create table person (id integer, name string)");
-//            statement.executeUpdate("insert into person values(1, 'leo')");
-//            statement.executeUpdate("insert into person values(2, 'yui')");
-//            ResultSet rs = statement.executeQuery("select * from person where id = 1");
-//
-////            System.out.println(rs);
-//            while(rs.next())
-//            {
-//                // read the result set
-//                System.out.println("name = " + rs.getString("name"));
-//                System.out.println("id = " + rs.getInt("id"));
-//            }
-//        } catch(SQLException e) {
-//            System.err.println(e.getMessage());
-//        }
-//        finally {
-//            try{
-//                if (connection != null) {
-//                    connection.close();
-//                }
-//            } catch (SQLException e){
-//                System.err.println(e.getMessage());
-//            }
-//        }
-//    }
+    }
 }
