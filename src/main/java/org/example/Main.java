@@ -2,6 +2,7 @@ package org.example;
 import java.sql.*;
 import java.util.Objects;
 
+// User class
 class User{
     private String username;
     private String password;
@@ -46,6 +47,7 @@ class User{
 
 }
 
+// Account class that extends from the user. Basically a user, account foreignKey relationship with code (I think).
 class Account extends User {
     private int pin;
     private int amount;
@@ -72,18 +74,18 @@ class Account extends User {
 
 public class Main {
 
+    // Static function that handles connection to the Database, so I don't have to write a very long and clunky script.
     public static Connection connectToDB(){
         Connection connection = null;
-        System.out.println("Connecting to DB...");
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:atm.db");
-            System.out.println("Successfully connected to DB. \n");
         } catch (SQLException error) {
             System.err.println(error.getMessage());
         }
         return connection;
     }
 
+    // Static function to drop any table you pass in as a parameter. It's best to always run this function, because you don't know what you might meet in the db.
     public static void dropTables(String tableName) throws SQLException {
         Connection connection = connectToDB();
         Statement statement = connection.createStatement();
@@ -94,24 +96,28 @@ public class Main {
         System.out.println("Successfully dropped table " + tableName);
     }
 
+    // Static function that creates a table in your database, by passing the tableName as a parameter
     public static void createTable(String tableName) throws SQLException {
         Connection connection = connectToDB();
 
         Statement statement = connection.createStatement();
-        statement.executeUpdate("create table " + tableName + " (id integer, username string, email string, password string)");
+        statement.executeUpdate("create table " + tableName + " (id integer, username string unique, email string, password string)");
 
         System.out.println("Successfully created new table called " + tableName);
     }
 
+    // Static function that creates the account table.
     public static void createAccountTable() throws SQLException {
         Connection connection = connectToDB();
 
         Statement statement = connection.createStatement();
-        statement.executeUpdate("create table account (id integer, username string, pin integer, amount integer)");
+        statement.executeUpdate("create table account (id integer, username string unique, pin integer, amount integer)");
 
         System.out.println("Successfully create new Account table");
     }
 
+    // Static function that inserts record into a particular table.
+    // In my case, the insert string is modified to fit the parameters I specified in my createTable function.
     public static void insertToTable(String newTableName, String username, String email, String password) throws SQLException {
         Connection connection = connectToDB();
 
@@ -126,6 +132,7 @@ public class Main {
         System.out.println("Successfully inserted new records!!");
     }
 
+    // Static function that inserts records into account table.
     public static void insertToAccountTable(String owner, int pin, int amount) throws SQLException {
         Connection connection = connectToDB();
 
@@ -141,6 +148,7 @@ public class Main {
         System.out.println("Records updated for account table");
     }
 
+    // Static function to check user pin.
     public static boolean checkPin(String username, int pin) throws SQLException {
         // open connection to the db
         Connection connection = connectToDB();
@@ -162,12 +170,13 @@ public class Main {
         return userPin == pin;
     }
 
+    // Static account that checks the users account balance.
     public static boolean checkAccountBalance(String username, int amountForWithdrawal) throws SQLException {
         Connection connection = connectToDB();
 
         Statement statement = connection.createStatement();
 
-        // SQL Query to return a user with the same username on both the account ans user table.
+        // SQL Query to return a user with the same username on both the account and user table.
         ResultSet rs = statement.executeQuery("select * from user inner join account on user.username=account.username");
 
         int usersBalance = 0;
@@ -182,12 +191,7 @@ public class Main {
         return amountForWithdrawal > usersBalance;
     }
 
-    public static void main(String[] args) {
-        // TODO
-        // Add logic to handle updating user amount/account balance after performing a withdrawal.
-        // Make the username field on both the account and user tables unique to reduce redundant code.
-        // Add logic to handle the ATM system withdrawal.
-        // Complete the logic on checkPin function.
+    public static void main(String[] args) throws SQLException {
 
     }
 }
