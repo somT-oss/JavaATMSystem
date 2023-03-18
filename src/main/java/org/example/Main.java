@@ -141,13 +141,25 @@ public class Main {
         System.out.println("Records updated for account table");
     }
 
-    public static boolean checkPin(String username, int pin) {
+    public static boolean checkPin(String username, int pin) throws SQLException {
         // open connection to the db
-        // execute a query to get a particular user by matching the username
-        // check if the pin is correct by matching the pin with the existing pin
-        // return boolean response
+        Connection connection = connectToDB();
 
-        return false;
+        // execute a query to get a particular user by matching the username
+        Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("select * from user inner join account on user.username=account.username");
+
+        // check if the pin is correct by matching the pin with the existing pin
+        int userPin = 0;
+        while (rs.next()) {
+            if (Objects.equals(rs.getString("username"), username)) {
+                userPin += rs.getInt("pin");
+            }
+            else {
+                break;
+            }
+        }
+        return userPin == pin;
     }
 
     public static boolean checkAccountBalance(String username, int amountForWithdrawal) throws SQLException {
